@@ -5,16 +5,20 @@ const serviceTechnology = new ServiceTechnology();
 
 export class TechnologyController {
     async list(req: Request, res: Response) {
+
         const user = req.user;
+
         try {
             const technologies = await serviceTechnology.list(user.id);
-            return res.status(200).json(req.user.technologies);
+            return res.status(200).json(technologies);
         } catch (error) {
             return res.status(404).json(error);
         }
     }
     async create(req: Request, res: Response) {
 
+        console.log(req.body);
+        
         const { title, deadline } = req.body;
         const user = req.user;
 
@@ -22,7 +26,7 @@ export class TechnologyController {
             const technology = await serviceTechnology.create(title, deadline, user);
             return res.status(201).json({ technology });
         } catch (error) {
-            return res.status(404).json(error);
+            return res.status(400).json({ error: error.message});
         }
     }
     async update(req: Request, res: Response) {
@@ -57,7 +61,7 @@ export class TechnologyController {
 
         try {
             await serviceTechnology.delete(id, user);
-            const technologies = serviceTechnology.list(id);
+            const technologies = await serviceTechnology.list(user.id);
             return res.status(200).json({ technologies });
         } catch (error) {
             return res.status(404).json({ error: "Technology not found" })

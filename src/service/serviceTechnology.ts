@@ -5,7 +5,7 @@ export class ServiceTechnology {
 
     async list(id: string) {
         try {
-            const technologies = prisma.technology.findMany({
+            const technologies = await prisma.technology.findMany({
                 where: {
                     userId: id
                 }
@@ -20,14 +20,13 @@ export class ServiceTechnology {
     }
 
     async create(title: string, deadline: Date, user: User) {
-
         try {
             const technology = await prisma.technology.findFirst({
                 where: {
                     title: title,
                     userId: user.id
                 }
-            })
+            });
 
             if (technology) {
                 throw new Error("Technology already exists");
@@ -40,18 +39,18 @@ export class ServiceTechnology {
                     deadline: new Date(deadline),
                     created_at: new Date(),
                     User: {
-                        connect: { id: user.id }
+                        connect: { id: user.id },
                     }
                 }
             });
 
             return newTechnology;
-        }
-
-        catch (error) {
+        } catch (error) {
+            console.error("Error creating technology:", error);
             throw error;
         }
     }
+
 
     async update(id: string, title: string, deadline: Date, user: User) {
         try {
